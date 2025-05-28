@@ -1,0 +1,90 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "credentialType": "whatsApp",
+        "event": "message",
+        "messageType": "text"
+      },
+      "name": "WhatsApp Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "your-webhook-id",
+      "credentials": {
+        "whatsApp": {
+          "id": "your-whatsapp-credential-id",
+          "name": "WhatsApp credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "http://localhost:3000/api/requests",
+        "options": {},
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "guestPhone",
+              "value": "={{$node['WhatsApp Trigger'].json.from}}"
+            },
+            {
+              "name": "requestText",
+              "value": "={{$node['WhatsApp Trigger'].json.text.body}}"
+            }
+          ]
+        }
+      },
+      "name": "Send to Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "credentialType": "whatsApp",
+        "phoneNumberId": "your-phone-number-id",
+        "recipient": "={{$node['WhatsApp Trigger'].json.from}}",
+        "messageType": "text",
+        "text": "Request received! Our staff will assist you soon."
+      },
+      "name": "Reply to Guest",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [680, 300],
+      "credentials": {
+        "whatsApp": {
+          "id": "your-whatsapp-credential-id",
+          "name": "WhatsApp credentials"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "WhatsApp Trproject strucute which is strickly followed bu also ger": {
+      "main": [
+        [
+          {
+            "node": "Send to Backend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to Backend": {
+      "main": [
+        [
+          {
+            "node": "Reply to Guest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
